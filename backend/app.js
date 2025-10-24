@@ -6,6 +6,8 @@ import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import rateLimit from "express-rate-limit";
+import courseRoutes from "./routes/courseRoutes.js";
+
 
 
 dotenv.config();
@@ -22,6 +24,7 @@ app.get("/", (req, res) => res.send("✅ AI Learning Assistant Backend Running")
 
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/courses", courseRoutes);
 
 
 const limiter = rateLimit({

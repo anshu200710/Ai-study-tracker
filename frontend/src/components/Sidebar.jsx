@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { Home, BookOpen, MessageCircle, Settings, LogOut } from "lucide-react";
 
 const Sidebar = () => {
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext); // ✅ include user here
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -26,15 +26,29 @@ const Sidebar = () => {
           <NavLink to="/dashboard" className={linkClasses}>
             <Home size={20} /> Dashboard
           </NavLink>
+
           <NavLink to="/courses" className={linkClasses}>
             <BookOpen size={20} /> Courses
           </NavLink>
+
+          <NavLink to="/my-courses" className={linkClasses}>
+            <BookOpen size={20} /> My Courses
+          </NavLink>
+
           <NavLink to="/chatbot" className={linkClasses}>
             <MessageCircle size={20} /> Chatbot
           </NavLink>
+
           <NavLink to="/settings" className={linkClasses}>
             <Settings size={20} /> Settings
           </NavLink>
+
+          {/* ✅ Show admin panel only if user.role === "admin" */}
+          {user?.role === "admin" && (
+            <NavLink to="/admin/courses" className={linkClasses}>
+              <Settings size={20} /> Admin Panel
+            </NavLink>
+          )}
         </nav>
       </div>
 
