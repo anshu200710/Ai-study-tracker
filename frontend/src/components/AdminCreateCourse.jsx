@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminCreateCourse = () => {
   const { user } = useContext(AuthContext);
+  console.log(user.token);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({

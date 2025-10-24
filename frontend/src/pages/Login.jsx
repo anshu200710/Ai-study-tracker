@@ -5,14 +5,17 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // ✅ Define handleChange to update form state
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,17 +23,19 @@ const Login = () => {
     setError("");
 
     try {
-      let data;
-      if (isRegister) {
-        data = await registerUser({ name, email, password });
-      } else {
-        data = await loginUser({ email, password });
-      }
+      const data = isRegister
+        ? await registerUser(form) // if you implement registration
+        : await loginUser({ email: form.email, password: form.password });
 
-      login(data);
-      navigate("/dashboard");
+      login(data); // save user + token in context and localStorage
+
+      // Redirect based on admin credentials
+      if (data.email === "ap@gmail.com") {
+        navigate("/admin/courses");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
-      console.error(err);
       setError("Authentication failed. Please check your details.");
     } finally {
       setLoading(false);
@@ -47,37 +52,45 @@ const Login = () => {
           {isRegister ? "Create an Account" : "Welcome Back"}
         </h2>
 
+        {/* Name Field (Only for Registration) */}
         {isRegister && (
           <input
             type="text"
+            name="name"
             placeholder="Full Name"
             className="border p-2 mb-4 w-full rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={form.name}
+            onChange={handleChange}
             required
           />
         )}
 
+        {/* Email */}
         <input
           type="email"
+          name="email"
           placeholder="Email"
           className="border p-2 mb-4 w-full rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={form.email}
+          onChange={handleChange}
           required
         />
 
+        {/* Password */}
         <input
           type="password"
+          name="password"
           placeholder="Password"
           className="border p-2 mb-4 w-full rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={form.password}
+          onChange={handleChange}
           required
         />
 
+        {/* Error Message */}
         {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
@@ -86,6 +99,7 @@ const Login = () => {
           {loading ? "Please wait..." : isRegister ? "Register" : "Login"}
         </button>
 
+        {/* Toggle Link */}
         <p className="text-center mt-4 text-sm text-gray-600">
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
