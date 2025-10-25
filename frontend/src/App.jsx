@@ -136,7 +136,12 @@ const App = () => {
         }
       />
 
-      <Route path="/courses/:id/content" element={<CourseContentPage/>} />
+      <Route path="/courses/:id/content" element={
+        <ProtectedRoute>
+            <DashboardLayout>
+              <CourseContentPage/>
+            </DashboardLayout>
+          </ProtectedRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/dashboard" />} />

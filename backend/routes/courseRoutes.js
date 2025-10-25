@@ -1,15 +1,16 @@
 // routes/courseRoutes.js
 import express from "express";
-import protect from "../middleware/authMiddleware.js";
+import protect from "../middleware/authmiddleware.js";
 import adminOnly from "../middleware/adminMiddleware.js";
-import { generateFlashcards, generateMCQs } from "../controllers/aiContentController.js";
+// import { generateFlashcards, generateMCQs } from "../controllers/aiContentController.js";
 import {
   createCourse,
   getAllCourses,
   getCourseById,
   enrollCourse,
   getEnrolledCourses,
-  updateCourse, deleteCourse
+  updateCourse, deleteCourse,
+  generateFlashcards, generateMCQs
 } from "../controllers/courseController.js";
 
 

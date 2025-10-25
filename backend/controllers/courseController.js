@@ -126,6 +126,8 @@ export const updateCourse = async (req, res) => {
 
 
 
+// courseController.js
+
 export const generateFlashcards = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -136,7 +138,7 @@ Generate 5 study flashcards based on the following course:
 Title: ${course.title}
 Description: ${course.description}
 
-Format response as JSON:
+Respond strictly as a JSON array like this:
 [
   {"question": "Q1", "answer": "A1"},
   {"question": "Q2", "answer": "A2"}
@@ -148,22 +150,26 @@ Format response as JSON:
       messages: [{ role: "user", content: prompt }],
     });
 
-    const text = completion.choices[0].message.content;
+    let text = completion.choices[0].message.content;
+
+    // Remove markdown code blocks if present
+    text = text.replace(/```json|```/g, "").trim();
+
+    // Parse JSON safely
     const flashcards = JSON.parse(text);
 
-    course.flashcards = flashcards;
+    // Append new flashcards
+    course.flashcards = [...(course.flashcards || []), ...flashcards];
     await course.save();
 
-    res.json({ message: "✅ Flashcards generated successfully!", flashcards });
+    res.json({ flashcards }); // return only new flashcards
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Error generating flashcards", error: error.message });
+    console.error("Flashcards generation error:", error);
+    res.status(500).json({ message: "Error generating flashcards", error: error.message });
   }
 };
 
-// ✅ Generate MCQs
+
 export const generateMCQs = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -179,7 +185,7 @@ Each MCQ should have:
 - "options" (array of 4 choices)
 - "correctAnswer"
 
-Format response as JSON:
+Respond strictly as a JSON array like this:
 [
   {
     "question": "Q1",
@@ -194,17 +200,25 @@ Format response as JSON:
       messages: [{ role: "user", content: prompt }],
     });
 
-    const text = completion.choices[0].message.content;
+    let text = completion.choices[0].message.content;
+
+    // Remove code blocks if present
+    text = text.replace(/```json|```/g, "").trim();
+
+    // Parse safely
     const mcqs = JSON.parse(text);
 
-    course.mcqs = mcqs;
+    // Append to existing MCQs
+    course.mcqs = [...(course.mcqs || []), ...mcqs];
     await course.save();
 
-    res.json({ message: "✅ MCQs generated successfully!", mcqs });
+    res.json({ mcqs }); // return only newly generated MCQs
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Error generating MCQs", error: error.message });
+    console.error("MCQs generation error:", error);
+    res.status(500).json({ message: "Error generating MCQs", error: error.message });
   }
 };
+
+
+
+
